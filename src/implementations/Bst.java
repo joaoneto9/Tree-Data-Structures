@@ -8,21 +8,169 @@ public class Bst {
         return this.root == null;
     }
 
+    // método mais complexo de se implementar em uma BST
+    public void remove(int n) {
+        Node nodeToRemove = getNode(n);
+
+        if (nodeToRemove == null)
+            return;
+
+        remove(nodeToRemove);
+    }
+
+    private void remove(Node nodeToRemove) {
+
+        // Caso 1: caso mais simples -> Nó é uma folha
+        if (nodeToRemove.isLeaf()) {
+            if (nodeToRemove.isRoot())
+                this.root = null;
+            else if (nodeToRemove.isRight())
+                nodeToRemove.parent.right = null;
+            else
+                nodeToRemove.parent.left = null;
+
+            return;
+        }
+
+        // Caso 2: o no tem apenas um filho: -> fazer para esquerda e para a direita
+        if (nodeToRemove.hasOnlyRightChild()) {
+            // verificar se é raiz
+            if (nodeToRemove.isRoot()) {
+                this.root = nodeToRemove.right; // seta a raiz.
+                nodeToRemove.right.parent = null; // como é a raiz, não apresenta mais pai.
+                return;
+            }
+
+            nodeToRemove.right.parent = nodeToRemove.parent; // seta o novo pai
+
+            if (nodeToRemove.isRight())
+                nodeToRemove.right.parent.right = nodeToRemove.right; // seta o novo filho do pai
+            else
+                nodeToRemove.right.parent.left = nodeToRemove.right;
+            return;
+        }
+
+        if (nodeToRemove.hasOnlyLeftChild()) {
+            if (nodeToRemove.isRoot()) {
+                this.root = nodeToRemove.left; // seta a raiz.
+                nodeToRemove.left.parent = null; // como é a raiz, não apresenta mais pai.
+                return;
+            }
+
+            nodeToRemove.left.parent = nodeToRemove.parent;
+
+            if (nodeToRemove.isRight())
+                nodeToRemove.left.parent.right = nodeToRemove.left;
+            else
+                nodeToRemove.left.parent.left = nodeToRemove.left;
+
+            return;
+        }
+        // Caso 3: tem dois filhos -> pegar o sucessor, fazer a troca e chamar recursivamnete a remoção dele
+        Node sucessor = sucessor(nodeToRemove);
+        nodeToRemove.value = sucessor.value;
+        remove(sucessor);
+        // garantimos que vai entrar no caso um ou dois, pois o sucessor ou é folha ou tem apenas um filho
+    }
+
     public void add(int n) {
         if (isEmpty())
             this.root = new Node(n);
         else add(n, this.root);
-    } 
+    }
+
+    public int max() {
+        if (isEmpty())
+            return -1;
+
+        return max(this.root).value;
+    }
+
+    private Node max(Node node) {
+        if (node.right == null)
+            return node;
+
+        return max(node.right);
+    }
+
+    public int min() {
+        if (isEmpty())
+            return -1; // should be an exception
+
+        return min(this.root).value;
+    }
+
+    private Node min(Node node) {
+        if (node.left == null)
+            return node;
+
+        return min(node.left);
+    }
+
+    public Node sucessor(Node node) {
+        if (node == null)
+            return null; // -> isso indica que não apresenta sucessor
+
+        if (node.right == null) { // não apresenta arvore a direita -> subir...
+            Node aux = node.parent;
+
+            while (aux != null && aux.value < node.value)
+                aux = aux.parent; // ele vai subindo ate achar alguem maior que ele
+
+            return aux;
+        }
+
+        return min(node.right); // retorna o mínimo da àrvore a direita: sucessor;
+    }
+
+    public Node predecessor(Node node) {
+        if (node == null)
+            return null;
+
+        if (node.left == null) {
+            Node aux = node.parent;
+
+            while (aux != null && aux.value > node.value) // se for maior, continue.
+                aux = aux.parent;
+
+            return aux;
+        }
+
+        return max(node.left); // retorna o maximo da arvore a esquerda: predecessor!
+    }
+
+    public Node getNode(int n) {
+        return getNode(n, this.root);
+    }
+
+    private Node getNode(int n, Node node) {
+        if (node == null)
+            return null;
+
+        if (n == node.value)
+            return node;
+
+        if (n > node.value)
+            return getNode(n, node.right);
+
+        return getNode(n, node.left);
+    }
 
     private void add(int n, Node node) {
-        if (node == null) {
-            node = new Node(n);
+        // n deve ser adicionado a direita do no
+        if (n > node.value) {
+            if (node.right == null) {
+                node.right = new Node(n);
+                node.right.parent = node;
+                return;
+            }
+            add(n, node.right);
             return;
         }
 
-        // n deve ser adicionado a direita do no
-        if (n > node.value) {
-            add(n, node.right);
+        if (node.left == null) {
+            node.left = new Node(n);
+            node.left.parent = node;
             return;
         }
         
@@ -51,18 +199,148 @@ public class Bst {
 
         assert bst.height() == 0;
         assert !bst.isEmpty();
+        assert bst.getNode(10) != null;
+        assert bst.max() == 10;
+        assert bst.min() == bst.max();
+        assert bst.sucessor(bst.getNode(10)) == null;
+        assert bst.predecessor(bst.getNode(10)) == null;
 
         bst.add(5);
 
         assert bst.height() == 1;
-        
+        assert bst.getNode(5) != null;
+        assert bst.getNode(5).parent.value == 10;
+        assert bst.min() == 5;
+        assert bst.max() == 10;
+        assert bst.sucessor(bst.getNode(5)).value == 10;
+        assert bst.predecessor(bst.getNode(5)) == null;
+        assert bst.sucessor(bst.getNode(10)) == null;
+        assert bst.predecessor(bst.getNode(10)).value == 5;
+
         bst.add(15);
 
         assert bst.height() == 1;
+        assert bst.getNode(15) != null;
+        assert bst.getNode(15).parent.value == 10;
+        assert bst.min() == 5;
+        assert bst.max() == 15;
+        assert bst.sucessor(bst.getNode(10)).value == 15;
+        assert bst.predecessor(bst.getNode(10)).value == 5;
 
         bst.add(2);
 
         assert bst.height() == 2;
+        assert bst.getNode(2) != null;
+        assert bst.getNode(2).parent.value == 5;
+        assert bst.min() == 2;
+        assert bst.max() == 15;
+        assert bst.sucessor(bst.getNode(5)).value == 10;
+        assert bst.predecessor(bst.getNode(5)).value == 2;
+        assert bst.predecessor(bst.getNode(2)) == null;
+        assert bst.sucessor(bst.getNode(15)) == null;
+        assert bst.predecessor(bst.getNode(15)).value == 10;
+
+        // casos de testes de remoção
+
+        // Caso 1: caso da folha
+        assert !bst.getNode(5).isLeaf(); // antes da remoção não é folha
+
+        bst.remove(2);
+
+        assert bst.getNode(2) == null;  // o no com esse valor foi removido
+        assert bst.getNode(5) != null;
+        assert bst.getNode(10) != null;
+        assert bst.getNode(15) != null;
+        assert bst.getNode(5).isLeaf(); // se torna folha
+        assert bst.height() == 1; // altura da árvore mudou
+
+        // Caso 2: caso de um filho
+
+        bst.add(2); // adicionando novamnete o 2 e t;estando com o 5 que agora é hasOnlyOneChildLeft
+
+        assert bst.getNode(5).hasOnlyLeftChild(); // caso dois -> filho a esquerda e esta a esquerda do pai
+        assert bst.height() == 2;
+
+        bst.remove(5);
+
+        assert bst.getNode(2).parent.value == 10; // o pai agora é 10 que é a raiz
+        assert bst.getNode(2).parent.isRoot();
+        assert bst.height() == 1;
+        assert bst.getNode(5) == null;
+        assert bst.getNode(2) != null;
+        assert bst.getNode(10) != null;
+        assert bst.getNode(15) != null;
+
+        // Caso 2: caso de um filho a direita e o no esta a esquerda do pai.
+
+        bst.remove(2);
+
+        bst.add(5);
+        bst.add(7);
+
+        assert bst.getNode(5).hasOnlyRightChild();
+        assert bst.getNode(7).isLeaf();
+        assert bst.height() == 2;
+
+        bst.remove(5);
+
+        assert bst.getNode(7).parent.value == 10; // o pai agora é 10 que é a raiz
+        assert bst.getNode(7).parent.isRoot();
+        assert bst.height() == 1;
+        assert bst.getNode(5) == null;
+        assert bst.getNode(7) != null;
+        assert bst.getNode(10) != null;
+        assert bst.getNode(15) != null;
+
+        // caso 2: caso de um filho a esquerda e o no esta a direita do pai
+
+        bst.add(12);
+
+        assert bst.getNode(15).hasOnlyLeftChild();
+        assert bst.getNode(15).isRight();
+        assert bst.height() == 2;
+
+        bst.remove(15);
+
+        assert bst.getNode(12).parent.value == 10;
+        assert bst.getNode(12).parent.isRoot();
+        assert bst.height() == 1;
+        assert bst.getNode(15) == null;
+        assert bst.getNode(7) != null;
+        assert bst.getNode(10) != null;
+        assert bst.getNode(12) != null;
+
+        // Caso 2: caso de um filho a direita e o no esta a direita do pai
+
+        bst.add(17);
+
+        assert bst.getNode(12).hasOnlyRightChild();
+        assert bst.getNode(12).isRight();
+        assert bst.height() == 2;
+
+        bst.remove(12);
+
+        assert bst.getNode(17).parent.value == 10;
+        assert bst.getNode(17).parent.isRoot();
+        assert bst.height() == 1;
+        assert bst.getNode(12) == null;
+        assert bst.getNode(7) != null;
+        assert bst.getNode(10) != null;
+        assert bst.getNode(17) != null;
+
+        // Caso 3: caso de um No que tem dois filhos -> teste da raiz
+
+        assert bst.getNode(17).isLeaf();
+        assert bst.getNode(17).isRight();
+
+        bst.remove(10);
+
+        assert bst.getNode(10) == null;
+        assert bst.getNode(7) != null;
+        assert bst.getNode(17) != null;
+        assert bst.getNode(17).isRoot();
+        assert bst.getNode(17).hasOnlyLeftChild();
+        assert bst.getNode(17).left.value == 7;
 
         System.out.println("PASSOU NOS TESTES!!");
     }
