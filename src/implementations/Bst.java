@@ -47,8 +47,6 @@ public class Bst {
         assert bst.height() == -1;
         assert bst.isEmpty();
 
-        System.out.println("PASSOU NOS TESTES!");
-
         bst.add(10);
 
         assert bst.height() == 0;
@@ -66,6 +64,7 @@ public class Bst {
 
         assert bst.height() == 2;
 
+        System.out.println("PASSOU NOS TESTES!!");
     }
 
 
