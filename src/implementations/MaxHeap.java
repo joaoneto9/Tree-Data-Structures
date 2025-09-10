@@ -12,6 +12,19 @@ public class MaxHeap {
         this.tail = -1;
     }
 
+    public MaxHeap (int[] array) {
+        this.tree = array;
+        this.tail = array.length - 1;
+        this.buildHeap();
+    }
+
+    // começa pelo pai do ultimo no
+    private void buildHeap() {
+        for (int i = parent(this.tail); i >= 0; i--) {
+            heapify(i);
+        }
+    }
+
     public int left(int i) {
         return 2 * i + 1;
     }
@@ -58,6 +71,54 @@ public class MaxHeap {
         int aux = this.tree[i];
         this.tree[i] = this.tree[j];
         this.tree[j] = aux;
+    }
+
+    // sempre remove a raiz
+    public void remove() {
+        swap(0, this.tail); // realiza o swap do ultimo elemento adicionado e a raiz (max)
+        this.tail--; // diminui o indice do tail, pois ele não esta mais no heap
+        heapify(0);
+    }
+
+    private void heapify(int index) {
+        if (isLeaf(index) || !isValidIndex(index))
+            return; // para se for indices invalidos
+
+        int maxIndex = maxIndex(index, left(index), right(index));
+
+        // existe um maior que o index
+        if (maxIndex != index) {
+            swap(index, maxIndex);
+            heapify(maxIndex); // chama recursivo para o elemente que realizou o swap (inicial)
+        }
+
+    }
+
+    private int maxIndex(int index, int left, int right) {
+        if (this.tree[index] > this.tree[left]) {
+            if (isValidIndex(right)) {
+                if (this.tree[index] < this.tree[right])
+                    return right;
+            }
+
+            return index;
+
+        } else {
+            if (isValidIndex(right)) {
+                if (this.tree[left] < this.tree[right])
+                    return right;
+            }
+
+            return left;
+        }
+    }
+
+    private boolean isValidIndex(int index) {
+        return index >= 0 && index <= tail;
+    }
+
+    private boolean isLeaf(int index) {
+        return index > parent(tail) && index <= tail;
     }
 
     @Override
