@@ -1,5 +1,8 @@
 package implementations;
 
+import java.util.Deque;
+import java.util.LinkedList;
+
 public class Bst {
 
     private Node root;
@@ -189,6 +192,79 @@ public class Bst {
         return 1 + Math.max(height(node.left), height(node.right));
     }
 
+    // Uso de uma linkedList garante a ordem dos nos e seus niveis, assim -> remove, printa o que removeu e adiciona os filhos
+    public void printBFS() {
+        Deque<Node> fila = new LinkedList<>();
+
+        if (isEmpty())
+            return;
+
+        fila.addLast(this.root);
+
+        while (!fila.isEmpty()) {
+            Node current = fila.removeFirst();
+
+            System.out.println(current.value);
+
+            if (current.left != null)
+                fila.addLast(current.left);
+            if (current.right != null)
+                fila.addLast(current.right);
+        }
+    }
+
+    public int contarFolhas() {
+        return contarFolhas(this.root);
+    }
+
+    private int contarFolhas(Node node) {
+        if (node == null)
+            return 0;
+        if (node.isLeaf())
+            return 1;
+
+        return contarFolhas(node.left) + contarFolhas(node.right);
+    }
+
+    public void posOrdem() {
+        posOrdem(this.root);
+    }
+
+    private void posOrdem(Node node) {
+        if (node == null)
+            return;
+
+        posOrdem(node.left);
+        posOrdem(node.right);
+        System.out.println(node.value);
+    }
+
+    // grava os nos em ordem sequencial
+    public void inOrder() {
+        inOrder(this.root);
+    }
+
+    private void inOrder(Node node) {
+        if (node == null)
+            return;
+
+        inOrder(node.left);
+        System.out.println(node.value);
+        inOrder(node.right);
+    }
+
+    // uma chave única para a árvore
+    public void preOrder() {
+        System.out.println(preOrder(this.root));
+    }
+
+    private String preOrder(Node node) {
+        if (node == null)
+            return "";
+
+        return node.value + preOrder(node.left) + preOrder(node.right);
+    }
+
     public static void main(String[] args) {
         Bst bst = new Bst();
 
@@ -204,6 +280,7 @@ public class Bst {
         assert bst.min() == bst.max();
         assert bst.sucessor(bst.getNode(10)) == null;
         assert bst.predecessor(bst.getNode(10)) == null;
+        assert bst.contarFolhas() == 1;
 
         bst.add(5);
 
@@ -216,6 +293,7 @@ public class Bst {
         assert bst.predecessor(bst.getNode(5)) == null;
         assert bst.sucessor(bst.getNode(10)) == null;
         assert bst.predecessor(bst.getNode(10)).value == 5;
+        assert bst.contarFolhas() == 1;
 
         bst.add(15);
 
@@ -226,6 +304,7 @@ public class Bst {
         assert bst.max() == 15;
         assert bst.sucessor(bst.getNode(10)).value == 15;
         assert bst.predecessor(bst.getNode(10)).value == 5;
+        assert bst.contarFolhas() == 2;
 
         bst.add(2);
 
@@ -239,6 +318,13 @@ public class Bst {
         assert bst.predecessor(bst.getNode(2)) == null;
         assert bst.sucessor(bst.getNode(15)) == null;
         assert bst.predecessor(bst.getNode(15)).value == 10;
+        assert bst.contarFolhas() == 2;
+
+        bst.posOrdem();
+        bst.preOrder();
+        bst.inOrder();
+        System.out.println("-------------------");
+        bst.printBFS();
 
         // casos de testes de remoção
 
@@ -253,6 +339,7 @@ public class Bst {
         assert bst.getNode(15) != null;
         assert bst.getNode(5).isLeaf(); // se torna folha
         assert bst.height() == 1; // altura da árvore mudou
+        assert bst.contarFolhas() == 2;
 
         // Caso 2: caso de um filho
 
@@ -260,6 +347,7 @@ public class Bst {
 
         assert bst.getNode(5).hasOnlyLeftChild(); // caso dois -> filho a esquerda e esta a esquerda do pai
         assert bst.height() == 2;
+        assert bst.contarFolhas() == 2;
 
         bst.remove(5);
 
@@ -270,6 +358,7 @@ public class Bst {
         assert bst.getNode(2) != null;
         assert bst.getNode(10) != null;
         assert bst.getNode(15) != null;
+        assert bst.contarFolhas() == 2;
 
         // Caso 2: caso de um filho a direita e o no esta a esquerda do pai.
 
@@ -343,6 +432,12 @@ public class Bst {
         assert bst.getNode(17).left.value == 7;
 
         System.out.println("PASSOU NOS TESTES!!");
+        bst.posOrdem();
+        bst.preOrder();
+        bst.inOrder();
+
+        System.out.println("-------------------");
+        bst.printBFS();
     }
 
 
