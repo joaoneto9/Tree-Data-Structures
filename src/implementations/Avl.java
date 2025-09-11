@@ -6,7 +6,6 @@ public class Avl {
 
     private Node root;
 
-
     public boolean isEmpy() {
         return this.root == null;
     }
@@ -22,14 +21,73 @@ public class Avl {
         return 1 + Math.max(height(node.left), height(node.right));
     }
 
-    private boolean checkUpBalance(Node node) {
-        if (node == null)
-            return true;
+    private void checkUpBalance(Node newNode, Node node) {
+        if (node == null) { // chegou depois da raiz -> parou
+            System.out.println("NÃO TEVE ROTAÇÂO");
+            return;
+        }
 
-        if (!node.isBalance())
-            return false;
+        // no não esta balanceado
+        if (!node.isBalance()) {
+            // pendendo para a esquerda, não esta balanceado e o último no adicionado foi para a esquerda
+            if (node.isPendingLeft() && newNode.isLeft()) {
+                rotateRight(node); // rotaciona para a direita o no desbalanceado
+            } else if (node.isPendingRight() && newNode.isRight()) {
+                rotateLeft(node);
+            } else if (node.isPendingLeft() && newNode.isRight()) {
+                rotateLeft(node.left);
+                rotateRight(node);
+            } else if (node.isPendingRight() && newNode.isLeft()) {
+                rotateRight(node.right);
+                rotateLeft(node);
+            }
 
-        return checkUpBalance(node.parent);
+            return;
+        }
+
+        checkUpBalance(newNode, node.parent);
+    }
+
+    private void rotateRight(Node n) {
+        System.out.println("ROTAÇÂO PARA A DIREITA!");
+        Node b = n.left;
+        b.parent = n.parent;
+        n.parent = b;
+        n.left = b.right;
+        if(b.right != null)
+            b.right.parent = n;
+        b.right = n;
+
+        if(b.parent != null){
+            if(b.parent.left == n){
+                b.parent.left = b;
+            } else{
+                b.parent.right = b;
+            }
+        } else {
+            this.root = b;
+        }
+    }
+
+    private void rotateLeft(Node n) {
+        System.out.println("ROTAÇÂO PARA A ESQUERDA!");
+        Node b = n.right;
+        b.parent = n.parent;
+        n.parent = b;
+        n.right = b.left;
+        if(b.left != null)
+            b.left.parent = n;
+        b.left = n;
+
+        if(b.parent != null){
+            if(b.parent.left == n)
+                b.parent.left = b;
+            else {
+                b.parent.right = b;
+            }
+        } else {
+            this.root = b;
+        }
     }
 
     public void add(int n) {
@@ -39,7 +97,7 @@ public class Avl {
         else {
             add(this.root, newNode);
             // implementar o check up balance
-            System.out.println(checkUpBalance(newNode));
+            checkUpBalance(newNode, newNode.parent);
         }
     }
 
@@ -47,7 +105,7 @@ public class Avl {
         if (newNode.value > node.value) {
             if (node.right == null) {
                 node.right = newNode;
-                newNode.parent = node;
+                node.right.parent = node;
                 return;
             }
 
@@ -57,7 +115,7 @@ public class Avl {
 
         if (node.left == null) {
             node.left = newNode;
-            newNode.parent = node;
+            node.left.parent = node;
             return;
         }
 

@@ -18,7 +18,7 @@ public class MaxHeap {
         this.buildHeap();
     }
 
-    // começa pelo pai do ultimo no
+    // começa pelo pai do ultimo nó e realiza o Heapfy até a raiz
     private void buildHeap() {
         for (int i = parent(this.tail); i >= 0; i--) {
             heapify(i);
@@ -131,6 +131,10 @@ public class MaxHeap {
         return this.tree[i] == 0 ? null : this.tree[i];
     }
 
+    public int getPeek() {
+        return this.tree[0];
+    }
+
     public static void main(String[] args) {
         MaxHeap maxHeap = new MaxHeap(10);
 
@@ -141,17 +145,19 @@ public class MaxHeap {
         assert !maxHeap.isEmpty();
         assert maxHeap.getNode(maxHeap.left(0)) == null;
         assert maxHeap.getNode(maxHeap.right(0)) == null;
+        assert maxHeap.getPeek() == 100;
 
         maxHeap.add(90);
 
         assert maxHeap.getNode(maxHeap.left(0)) == 90;
         assert maxHeap.getNode(maxHeap.right(0)) == null;
-
+        assert maxHeap.getPeek() == 100;
 
         maxHeap.add(80);
 
         assert maxHeap.getNode(maxHeap.left(0)) == 90;
         assert maxHeap.getNode(maxHeap.right(0)) == 80;
+        assert maxHeap.getPeek() == 100;
 
         maxHeap.add(70);
 
@@ -159,6 +165,7 @@ public class MaxHeap {
         assert maxHeap.getNode(maxHeap.right(0)) == 80;
         assert maxHeap.getNode(maxHeap.left(maxHeap.left(0))) == 70;
         assert maxHeap.getNode(maxHeap.right(maxHeap.left(0))) == null;
+        assert maxHeap.getPeek() == 100;
 
         maxHeap.add(50);
 
@@ -166,6 +173,7 @@ public class MaxHeap {
         assert maxHeap.getNode(maxHeap.right(0)) == 80;
         assert maxHeap.getNode(maxHeap.left(maxHeap.left(0))) == 70;
         assert maxHeap.getNode(maxHeap.right(maxHeap.left(0))) == 50;
+        assert maxHeap.getPeek() == 100;
 
         maxHeap.add(100);
 
@@ -175,6 +183,7 @@ public class MaxHeap {
         assert maxHeap.getNode(maxHeap.left(maxHeap.left(0))) == 70;
         assert maxHeap.getNode(maxHeap.right(maxHeap.left(0))) == 50;
         assert maxHeap.getNode(maxHeap.left(maxHeap.right(0))) == 80;
+        assert maxHeap.getPeek() == 100;
 
         maxHeap.add(120); // esta funcionando corretamente
 
@@ -185,6 +194,19 @@ public class MaxHeap {
         assert maxHeap.getNode(maxHeap.right(maxHeap.left(0))) == 50;
         assert maxHeap.getNode(maxHeap.left(maxHeap.right(0))) == 80;
         assert maxHeap.getNode(maxHeap.right(maxHeap.right(0))) == 100;
+        assert maxHeap.getPeek() == 120;
+
+        maxHeap.remove();
+
+        assert maxHeap.getPeek() == 100;
+
+        maxHeap.remove();
+
+        assert maxHeap.getPeek() == 100;
+
+        maxHeap.remove();
+
+        assert maxHeap.getPeek() == 90;
 
         System.out.println("PASSOU NOS TESTES!!!");
         System.out.println(maxHeap);

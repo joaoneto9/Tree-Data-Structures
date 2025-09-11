@@ -254,8 +254,8 @@ public class Bst {
     }
 
     // uma chave única para a árvore
-    public void preOrder() {
-        System.out.println(preOrder(this.root));
+    public String preOrder() {
+        return preOrder(this.root);
     }
 
     private String preOrder(Node node) {
@@ -263,6 +263,31 @@ public class Bst {
             return "";
 
         return node.value + preOrder(node.left) + preOrder(node.right);
+    }
+
+    public boolean equals(Object o) {
+        if (o == null)
+            return false;
+
+        if (!(o instanceof Bst))
+            return false;
+
+        return ((Bst) o).preOrder().equals(this.preOrder());
+    }
+
+    public int maxHeightDiference() {
+        if (isEmpty())
+            return 0;
+
+        return maxHeightDiference(this.root);
+
+    }
+
+    private int maxHeightDiference(Node node) {
+        if (node == null)
+            return 0;
+
+        return Math.max(Math.abs(node.balance()), Math.max(maxHeightDiference(node.left), maxHeightDiference(node.right)));
     }
 
     public static void main(String[] args) {
@@ -320,11 +345,7 @@ public class Bst {
         assert bst.predecessor(bst.getNode(15)).value == 10;
         assert bst.contarFolhas() == 2;
 
-        bst.posOrdem();
-        bst.preOrder();
-        bst.inOrder();
-        System.out.println("-------------------");
-        bst.printBFS();
+        assert bst.maxHeightDiference() == 1;
 
         // casos de testes de remoção
 
@@ -341,6 +362,8 @@ public class Bst {
         assert bst.height() == 1; // altura da árvore mudou
         assert bst.contarFolhas() == 2;
 
+        assert bst.maxHeightDiference() == 0;
+
         // Caso 2: caso de um filho
 
         bst.add(2); // adicionando novamnete o 2 e t;estando com o 5 que agora é hasOnlyOneChildLeft
@@ -348,6 +371,8 @@ public class Bst {
         assert bst.getNode(5).hasOnlyLeftChild(); // caso dois -> filho a esquerda e esta a esquerda do pai
         assert bst.height() == 2;
         assert bst.contarFolhas() == 2;
+
+        assert bst.maxHeightDiference() == 1;
 
         bst.remove(5);
 
@@ -360,12 +385,22 @@ public class Bst {
         assert bst.getNode(15) != null;
         assert bst.contarFolhas() == 2;
 
+        assert bst.maxHeightDiference() == 0;
+
+
         // Caso 2: caso de um filho a direita e o no esta a esquerda do pai.
 
         bst.remove(2);
 
+        assert bst.maxHeightDiference() == 1;
+
         bst.add(5);
+
+        assert bst.maxHeightDiference() == 0;
+
         bst.add(7);
+
+        assert bst.maxHeightDiference() == 1;
 
         assert bst.getNode(5).hasOnlyRightChild();
         assert bst.getNode(7).isLeaf();
@@ -431,13 +466,30 @@ public class Bst {
         assert bst.getNode(17).hasOnlyLeftChild();
         assert bst.getNode(17).left.value == 7;
 
-        System.out.println("PASSOU NOS TESTES!!");
-        bst.posOrdem();
-        bst.preOrder();
-        bst.inOrder();
+        Bst bst2 = new Bst();
 
-        System.out.println("-------------------");
-        bst.printBFS();
+        bst2.add(17); // raiz
+        bst2.add(7);
+
+        assert bst.equals(bst2);
+
+        bst.remove(7);
+
+        assert !bst.equals(bst2);
+
+        bst2.remove(7);
+
+        assert bst.equals(bst2);
+
+        bst.add(10);
+        bst.add(11);
+
+        bst2.add(11);
+        bst2.add(10);
+
+        assert !bst.equals(bst2);
+
+        System.out.println("PASSOU NOS TESTES!!");
     }
 
 
