@@ -21,6 +21,20 @@ public class Bst {
         remove(nodeToRemove);
     }
 
+    public boolean isAvl() {
+        return isAvl(this.root);
+    }
+
+    private boolean isAvl(Node node) {
+        if (node == null)
+            return true;
+
+        if (!node.isBalance())
+            return false;
+
+        return isAvl(node.left) && isAvl(node.right);
+    }
+
     private void remove(Node nodeToRemove) {
 
         // Caso 1: caso mais simples -> Nó é uma folha

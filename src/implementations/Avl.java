@@ -122,6 +122,33 @@ public class Avl {
         add(node.left, newNode);
     }
 
+    public void fixTree(Node[] array) {
+        // como so tem tres nos, apenas a raiz pode estar desbalanceada
+        if (array[0].isBalance())
+            return; // ja esta balanceado
+
+        // pendendo pra esquerda e ultimo adicionado esta a esquerda
+        if (array[0].isPendingLeft() && array[2].isLeft()) {
+            rotateRightLimitNodes(array);
+        } else if (array[0].isPendingRight() && array[2].isRight()) {
+            rotateLeftLimitNodes(array);
+        } else if (array[0].isPendingLeft() && array[2].isRight()) {
+            rotateLeftLimitNodes(array);
+            rotateRightLimitNodes(array);
+        } else if (array[0].isPendingRight() && array[2].isLeft()) {
+            rotateRightLimitNodes(array);
+            rotateLeftLimitNodes(array);
+        }
+    }
+
+
+    private void rotateRightLimitNodes(Node[] nodes) {
+    }
+
+    private void rotateLeftLimitNodes(Node[] nodes) {
+
+    }
+
     public static void main(String[] args) {
         try (Scanner sc = new Scanner(System.in)) {
             Avl tree = new Avl();
