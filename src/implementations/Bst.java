@@ -29,10 +29,7 @@ public class Bst {
         if (node == null)
             return true;
 
-        if (!node.isBalance())
-            return false;
-
-        return isAvl(node.left) && isAvl(node.right);
+        return node.isBalance() && isAvl(node.left) && isAvl(node.right);
     }
 
     private void remove(Node nodeToRemove) {

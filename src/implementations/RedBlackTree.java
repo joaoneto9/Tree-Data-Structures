@@ -177,9 +177,6 @@ public class RedBlackTree {
 
         return search(n, node.left);
     }
-
-
-
 }
 
 class BlackTreeNode {
@@ -205,16 +202,16 @@ class BlackTreeNode {
     }
 
     int blackHeight() {
-        return blackHeight(this);
+        return blackHeight(this.left);
     }
 
     private int blackHeight(BlackTreeNode node) {
         if (node == null)
-            return 0; // -> se for null => contabiliza
+            return 1; // -> se for null => contabiliza
 
-        int maxBlackHeight = Math.max(blackHeight(node.left), blackHeight(node.right));
-        return node.color.equals(Color.BLACK) ? 1 + maxBlackHeight : maxBlackHeight;
-        // se é preto, soma e chama recursivo | se é vermelha, apenas chama recursivo
+        int leftHeight = blackHeight(node.left);
+
+        return node.isBlack() ? 1 + leftHeight : leftHeight; // apenas um caminho ja e suficiente
     }
 
     boolean isRoot() {
@@ -248,6 +245,20 @@ class BlackTreeNode {
     boolean uncleIsBlack() {
         BlackTreeNode uncle = uncle();
         return uncle == null || uncle.isBlack();
+    }
+
+    public static void main(String[] args) {
+        BlackTreeNode node = new BlackTreeNode(5, Color.BLACK);
+
+        node.left = new BlackTreeNode(2, Color.RED);
+
+        assert node.blackHeight(node.right) == node.blackHeight();
+        assert node.blackHeight() == 1;
+
+        node.right = new BlackTreeNode(7, Color.RED);
+
+        assert node.blackHeight(node.right) == node.blackHeight();
+        assert node.blackHeight() == 1;
     }
 }
 
